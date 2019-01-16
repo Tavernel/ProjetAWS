@@ -1,6 +1,9 @@
 BUCKET_NAME="sarahtav.aws-fr.com"
 BUCKET_REGION="eu-west-3"
+
+#Creation du bucket
 aws s3 mb s3://${BUCKET_NAME} --region ${BUCKET_REGION}
+# Configuration Policy
 echo '{
   "Version": "2012-10-17",
   "Statement": [
@@ -15,8 +18,11 @@ echo '{
 }' > /tmp/policy.json
 
 aws s3api put-bucket-policy --bucket ${BUCKET_NAME} --policy file:///tmp/policy.json
+
+# Configuration website
 aws s3 website s3://${BUCKET_NAME} --index-document index.html --error-document error.html
 
+# Configuration page HTML
 mkdir website
 cat << EOF >> website/index.html
 <html xmlns="http://www.w3.org/1999/xhtml" >
@@ -35,5 +41,12 @@ cat << EOF >> website/index.html
 </body>
 </html>
 EOF
+
+# Synchronisation
 aws s3 sync --acl public-read --sse --delete website/ s3://${BUCKET_NAME}
+
+# Test final
 curl http://${BUCKET_NAME}.s3-website.eu-west-3.amazonaws.com/
+
+#aws s3 rm s3://${BUCKET_NAME} --recursive
+#aws s3 rb s3://${BUCKET_NAME}
