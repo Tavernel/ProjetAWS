@@ -32,7 +32,5 @@
         file_root: website/
         permission: public-read
         delete: yes
-#    - name: set website configuration index/error file
 #    - name: create a index HTML page
-#    - name: synchronize the files
 #    - name: test the website
