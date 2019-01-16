@@ -2,7 +2,7 @@
 - name: Deploy S3 Static Website
   hosts: localhost 
   vars:
-    BUCKET_NAME: "sarahtav"
+    BUCKET_NAME: "sarahtave"
     BUCKET_REGION: "eu-west-3"
   tasks:
           #    - name: create a S3 policy file
@@ -32,5 +32,12 @@
         file_root: website/
         permission: public-read
         delete: yes
-#    - name: create a index HTML page
-#    - name: test the website
+    - name: 5 sec. waiting
+      pause:
+        seconds: 5
+    - name: test the website
+      uri:
+        url: "http://{{ BUCKET_NAME }}.s3-website.{{ BUCKET_REGION }}.amazonaws.com/"
+        return_content: yes
+      register: thepage
+      failed_when: "'Now hosted on Amazon S3!' not in thepage.content"
