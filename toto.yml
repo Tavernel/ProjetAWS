@@ -1,15 +1,38 @@
 ---
 - name: Deploy S3 Static Website
-  hosts: localhost
+  hosts: localhost 
   vars:
     BUCKET_NAME: "sarahtav"
     BUCKET_REGION: "eu-west-3"
   tasks:
-    - name: Installation du Bucket S3
-      module:
-        parametre: XX
-    - name: Attach a policy the bucket
-    - name: Set website configuration index/error file
-    - name: create a index HTML page
+          #    - name: create a S3 policy file
+          #      template:
+          #        src: policy.json.j2
+          #        dest: /tmp/policy.json
+    - name: Create a bucket and attach policy
+      s3_bucket:
+        name: "{{ BUCKET_NAME }}"
+        state: present
+        policy: # "{{ lookup('file','/tmp/policy.json') }}"
+          Version: '2012-10-17'
+          Statement:
+          - Sid: Allow Public Access to All Objects
+            Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: arn:aws:s3:::{{ BUCKET_NAME }}/*
+    - name: set website configuration index/error file
+      s3_website:
+        name: "{{ BUCKET_NAME }}"
+        state: present
+        error_key: error.html
     - name: synchronize the files
-    - name: test the website
+      s3_sync:
+        bucket: "{{ BUCKET_NAME }}"
+        file_root: website/
+        permission: public-read
+        delete: yes
+#    - name: set website configuration index/error file
+#    - name: create a index HTML page
+#    - name: synchronize the files
+#    - name: test the website
